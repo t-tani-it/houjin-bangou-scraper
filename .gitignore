@@ -1,0 +1,20 @@
+# 実行時生成物（公開禁止情報は含まれないが、成果物の追跡対象外）
+data/
+logs/
+state/
+
+# 生成物・抽出物（成果物は .md/.mmd などソースのみ追跡）
+py_source_export/
+*.pdf
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# OS
+.DS_Store
+Thumbs.db

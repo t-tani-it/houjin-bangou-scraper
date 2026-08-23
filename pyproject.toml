@@ -1,0 +1,15 @@
+# -*- coding: utf-8 -*-
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+# 意図的な設計を逃すルール
+# - UP009: ファイル先頭の encoding 宣言はプロジェクト規約（AGENTS.md）で必須
+# - DTZ005/DTZ011: 実行環境はJST固定で、発生日時はローカル時刻（naive）を記録する設計
+# - S110/BLE001: エントリポイントで「例外で止めず継続」するための広域 except は意図的
+# - TRY401: 例外詳細をメッセージに含める運用ログに合わせる
+ignore = ["UP009", "DTZ005", "DTZ011", "S110", "BLE001", "TRY401", "RUF100"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
