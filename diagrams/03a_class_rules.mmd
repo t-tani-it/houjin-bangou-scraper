@@ -1,0 +1,89 @@
+classDiagram
+    class SiteSession {
+        +session: requests.Session
+        +form: dict
+        +token: str
+        +build_form(soup) dict
+        +build_json_payload(soup) dict
+        +sleep() None
+        -_get(url, timeout, referer) Response
+        -_post(url, data, json_, timeout, referer) Response
+        +fetch_index() BeautifulSoup
+        +get_prefecture_options() list
+        +resolve_prefecture_code(name) str
+        +fetch_municipalities(pref_code) list
+        +get_era_options() dict
+        +post_search(overrides, base_form, referer) tuple
+    }
+
+    class PageFetcher {
+        +total_pages: int
+        +success_records: int
+        +failed_records_in_run: int
+        +failed_urls_in_run: list
+        +over_limit_skipped: list
+        +make_query_key(area, date_range) str
+        -_date_overrides(date_range) dict
+        -_area_overrides(area, extra) dict
+        -_query(overrides, base_form, referer) tuple
+        +fetch_all_pages(area, date_range, page1_soup, page1_form, total) None
+        -_store_page(area, query_key, page, rows) None
+        -_upsert_one(area, raw) None
+        +process_area(area) None
+        +collect_range(area, date_range, depth) None
+        -_skip_oversize(area, date_range, reason) None
+    }
+
+    class Database {
+        +db_path: Path
+        +connect() None
+        -_init_schema() None
+        +close() None
+        +begin() / commit() / rollback()
+        +upsert_company(rec, detail_url) None
+        +add_fetch_log(query_key, page_no, ...) None
+        +add_failed_record(corporate_number, url, ...) None
+        +add_run_log(started_at, ended_at, ...) None
+        +count_companies() int
+        +count_failed(started_at) int
+        +failed_urls(started_at) list
+    }
+
+    class ProgressState {
+        +data: dict
+        +is_completed(query_key, page_no) bool
+        +mark_completed(query_key, page_no) None
+        +is_query_done(query_key) bool
+        +mark_query_done(query_key) None
+        +is_skipped(query_key) bool
+        +mark_skipped(query_key) None
+        +save() None
+        +load() None
+    }
+
+    class RecordLogger {
+        +started_at: datetime
+        +log_start(description) None
+        +log_page_success(query_key, page, count) None
+        +log_page_failure(query_key, page, url, err) None
+        +log_query_over_limit(query_key, count) None
+        +log_summary(total_pages, success_records, ...) None
+        +now() str
+    }
+
+    class SiteFetchError {
+        <<RuntimeError>>
+        +HTTPエラー / タイムアウト
+    }
+
+    class ParseError {
+        <<RuntimeError>>
+        +HTMLパース（フォーム抽出）失敗
+    }
+
+    PageFetcher --> SiteSession : POST検索・ページ送り
+    PageFetcher --> Database : 保存・失敗記録
+    PageFetcher --> ProgressState : resume管理
+    PageFetcher --> RecordLogger : ログ出力
+    SiteSession ..> SiteFetchError : post_search で送出
+    SiteSession ..> ParseError : フォーム/トークン抽出失敗

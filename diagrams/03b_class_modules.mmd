@@ -1,0 +1,77 @@
+classDiagram
+    class Main {
+        +main(argv) int
+        +validate_input(args) list
+        +execute_logic(prefs, logger, db, state, args) dict
+        +format_output(summary) str
+    }
+
+    class PageFetcher {
+        <<src/paginator.py>>
+        +process_area / collect_range
+        +fetch_all_pages / _skip_oversize
+        +make_query_key / _date_overrides
+    }
+
+    class SiteSession {
+        <<src/http_client.py>>
+        +fetch_index / post_search
+        +fetch_municipalities / get_era_options
+        +sleep / _get / _post
+        +SiteFetchError / ParseError
+    }
+
+    class Parser {
+        <<src/parser.py>>
+        +parse_results / extract_total
+        +is_over_limit / _text_without
+        +enrich_with_detail / _anchor_of
+    }
+
+    class Database {
+        <<src/database.py>>
+        +connect / close
+        +upsert_company / add_fetch_log
+        +add_failed_record / add_run_log
+        +DB_SCHEMA_SQL (4テーブル)
+    }
+
+    class ProgressState {
+        <<src/state.py>>
+        +is_completed / mark_completed
+        +is_query_done / mark_query_done
+        +is_skipped / mark_skipped
+        +save / load
+    }
+
+    class RecordLogger {
+        <<src/logger.py>>
+        +log_start / log_summary
+        +log_page_success / log_page_failure
+        +log_query_over_limit / now
+    }
+
+    class Config {
+        <<config.py + src/config.py>>
+        +BASE_URL / SEARCH_URL / AJAX_URL
+        +PAGE_SIZE / MAX_DISPLAY_LIMIT
+        +ACCESS_INTERVAL / MAX_RETRIES
+        +SELECTORS (CSS抽出条件)
+        +DateRange / era_code / parse_era_options
+    }
+
+    Main --> PageFetcher : 市区町村処理
+    Main --> SiteSession : トークン・市区町村一覧
+    Main --> Database : サマリー保存
+    Main --> ProgressState : 進捗管理
+    Main --> RecordLogger : ログ
+    PageFetcher --> SiteSession : 検索POST
+    PageFetcher --> Parser : 結果解析
+    PageFetcher --> Database : 保存
+    PageFetcher --> ProgressState : resume
+    PageFetcher --> RecordLogger : ログ
+    SiteSession --> Config : 設定値
+    Parser --> Config : SELECTORS
+    Database --> Config : DB_PATH
+    ProgressState --> Config : STATE_PATH
+    RecordLogger --> Config : LOG_DIR
