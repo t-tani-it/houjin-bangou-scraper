@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="charts/地域法人情報スクレイパーの全体像.png" alt="法人番号スクレイパーの紹介バナー">
+</p>
+
 # houjin-bangou-scraper - 法人番号公表サイト スクレイパ
 
 国税庁法人番号公表サイト（https://www.houjin-bangou.nta.go.jp/）から、

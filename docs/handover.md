@@ -62,3 +62,33 @@ python -m src.main --prefectures 東京都 --date-start 2015-10-01
 
 ## 公開禁止情報
 公開禁止情報は含まれていません
+
+---
+
+## 2026-10-26 紹介バナー反映
+
+### 方針（計画）
+- アーカイブ側にのみ存在する紹介バナーを正規プロジェクトへコピーし、READMEから表示する
+- アーカイブは削除せず、正規プロジェクトへの反映を確認する
+
+### 実装（実行）
+- `houjin-bangou-scraper-main/charts/地域法人情報スクレイパーの全体像.png`を`charts/`へコピー
+- README先頭に相対パスでバナーを追加
+- ソースコード、DB、進捗データには変更なし
+
+### 結果
+- 正規プロジェクトのREADMEとGitHubへ画像を追加
+- アーカイブフォルダは保持
+- ドキュメント／画像のみの変更のため、pytest／ruffは未実行
+- 公開禁止情報は含まれていません
+
+### 残タスク
+- なし
+
+### 実行コマンド
+```powershell
+Copy-Item ..\houjin-bangou-scraper-main\charts\地域法人情報スクレイパーの全体像.png charts\
+git add README.md docs/handover.md charts/地域法人情報スクレイパーの全体像.png
+git commit -m "docs: add project banner"
+git push origin main
+```
